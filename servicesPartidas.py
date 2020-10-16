@@ -1,0 +1,2 @@
+class ServicesPartidas():
+    pass
