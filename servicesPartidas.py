@@ -1,46 +1,44 @@
 from partida import Partida
-from partida import Partida
 from repository import Repository
+from repository import GuardarPartida
 import random
 
-class ServicesPartidas():
-    def iniciar_partida(self, nombre_jugador, dificultad, palabra="", tipo_palabra=""):
-        try:
-            if len(palabra) == 0 and len(tipo_palabra) == 0:
-                random = self.get_random_palabra()
-                palabra = random["palabra"]
-                tipo_palabra = random["tipo_palabra"]
-                intentos = self.valorIntentos(dificultad, palabra)
-                return Partida(palabra, intentos, tipo_palabra, nombre_jugador)
-        except Exception:
-            raise
-    
-    def valorIntentos(self, dificultad, palabra):
-        self.palabra = Partida.palabra
-        try:
-            if dificultad < 1 or dificultad > 10:
-                raise ValueError("La dificultad debe comprender entre 1 y 10")
-            else:
-                intentos = len(palabra) * dificultad
-                return intentos
-        except ValueError:
-            raise
+
+class ServicesPartidas:
+    def __init__(self):
+        self.repo_palabras = Repository.repositorioPalabras
+        self.guardar = GuardarPartida
+
+    def iniciar_partida(self, nombre_jugador, dificultad, palabra='',
+                        tipo_palabra=''):
+        if dificultad < 1 or dificultad > 10:
+            raise ValueError("La dificultad debe comprender entre 1 y 10")
+        if (len(palabra) == 0 or palabra is None and len(tipo_palabra) == 0 or
+           tipo_palabra is None):
+            randomKey = random.choice(list(self.repo_palabras.keys()))
+            palabra = self.repo_palabras[randomKey]['palabra']
+            tipo_palabra = self.repo_palabras[randomKey]['tipo_palabra']
+        intentos = dificultad * len(palabra)
+        partidaUno = Partida(palabra, intentos, tipo_palabra, nombre_jugador)
+        key = partidaUno._nombre_jugador
+        self.guardar.saves[key] = partidaUno.__dict__
+        return partidaUno
 
     def get_random_palabra(self):
-        return Repository.repositorioPalabras[random.randrange(1,29)]
+        randomKey = random.choice(list(self.repo_palabras.keys()))
+        return self.repo_palabras[randomKey]
 
-    
     def intentar_letra(self, partida, letra):
-        letra = letra.upper()
-        while partida.intentos > 0:
-            partida.intentos -= 1
-            for i in range(0, len(partida.palabra)):
-                if partida.palabra[i] == letra:
-                    partida.palabra_aciertos[i] = letra
-            if partida.palabra_aciertos == partida.palabra:
-                return 'Gano'
-            if partida.intentos == 0:
+        partida._intentos = partida._intentos - 1
+        if partida._intentos < 0:
+            raise ValueError("No tienes mas intentos")
+        for i in range(len(partida._palabra)):
+            if letra == partida._palabra[i]:
+                partida._palabra_aciertos[i] = letra
+        if None in partida._palabra_aciertos:
+            if partida._intentos == 0:
                 return 'Perdio'
-            if partida.palabra_aciertos != partida.palabra:
+            else:
                 return 'Continua'
-        raise ValueError
+        else:
+            return 'Gano'

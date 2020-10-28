@@ -11,6 +11,7 @@ class TestPartida(unittest.TestCase):
     # tipo_palabra: para dar orientacion al jugador
     # palabra: palabra que tiene que adivinar
     def test_constructor_con_valores_iniciales_partida(self):
+        self.maxDiff = None
         partida = Partida('python', 2, 'lenguaje de programacion', 'Claudio')
         self.assertDictEqual(partida.__dict__, {'_palabra':
                                                 ['P', 'Y', 'T', 'H', 'O', 'N'],
