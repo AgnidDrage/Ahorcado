@@ -4,7 +4,8 @@ from servicesPartidas import ServicesPartidas
 
 class Ahorcado:
     def menu_ahorcado(self):
-        print('Seleccione 1 para Un Jugador, 2 para Dos Jugadores o cualquier otro numero para salir')
+        print('Seleccione 1 para Un Jugador, 2 para Dos Jugadores o cualquier'
+              ' otro numero para salir: ')
         return int(input('Elija una opción: '))
 
     def un_jugador(self):
